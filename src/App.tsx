@@ -1,5 +1,12 @@
-import './App.css'
+import { useState } from 'react'
 import proj4 from 'proj4'
+import heroImg from './assets/hero.png'
+import reactLogo from './assets/react.svg'
+import viteLogo from './assets/vite.svg'
+import './App.css'
+
+// Parte lógica do cógido
+
 //SIRGAS2000
   proj4.defs("EPSG:4674","+proj=longlat +ellps=GRS80 +no_defs +type=crs");
 //UTM Sul
@@ -35,12 +42,38 @@ import proj4 from 'proj4'
   const utm20n = proj4('EPSG:31974');
   const utm21n = proj4('EPSG:31975');
   const utm22n = proj4('EPSG:31976');
+  const UTMsul = [utm17s, utm18s, utm19s, utm20s, utm21s, utm22s, utm23s, utm24s, utm25s];
+  const UTMnorte = [utm18n, utm19n, utm20n, utm21n, utm22n];
+  const cordenadasgps: Cordenadas[] = [];
+  const cordenadasutm: Cordenadas[] = [];
+
+  type Cordenadas = {
+    latitude: number;
+    longitude: number;
+  };
+  function handleSubmit(e: React.FormEvent  <HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const latitude = formData.get("latitude") as string;
+    const longitude = formData.get("longitude") as string;
+    cordenadasgps.push({ latitude: parseFloat(latitude), longitude: parseFloat(longitude) });
+     e.currentTarget.reset();
+    console.log(cordenadasgps);
+  }
   
-    
- // Parte lógica do cógido
+  // testegit 
+  // Falta implementar a função de conversão de coordenadas GPS para UTM, que deve ser chamada após a inserção das coordenadas GPS.
+function App() {
+  const [count, setCount] = useState(0)
 
- 
-  // Parte visual do código
+  return (
+    <>
+      <form onSubmit={handleSubmit}>
+        Insira latitude: <input type="text" name="latitude" id="latitude" />
+        Insira longitude: <input type="text" name="longitude" id="longitude" />
+        <button type="submit">Enviar</button>
+      </form>
+    </>
+  )
 }
-
 export default App
