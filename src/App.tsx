@@ -42,10 +42,10 @@ import './App.css'
   const utm20n = proj4('EPSG:31974');
   const utm21n = proj4('EPSG:31975');
   const utm22n = proj4('EPSG:31976');
-  const UTMsul = [utm17s, utm18s, utm19s, utm20s, utm21s, utm22s, utm23s, utm24s, utm25s];
-  const UTMnorte = [utm18n, utm19n, utm20n, utm21n, utm22n];
-  const cordenadasgps: Cordenadas[] = [];
-  const cordenadasutm: Cordenadas[] = [];
+  const UTMsul: Record<number, any> = { 17: utm17s, 18: utm18s, 19: utm19s, 20: utm20s, 21: utm21s, 22: utm22s, 23: utm23s, 24: utm24s, 25: utm25s };
+  const UTMnorte: Record<number, any> = { 18: utm18n, 19: utm19n, 20: utm20n, 21: utm21n, 22: utm22n };
+  let cordenadasgps: Cordenadas[] = [];
+  let cordenadasutm: Cordenadas[] = [];
 
   type Cordenadas = {
     latitude: number;
@@ -53,16 +53,30 @@ import './App.css'
   };
   function handleSubmit(e: React.FormEvent  <HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const latitude = formData.get("latitude") as string;
-    const longitude = formData.get("longitude") as string;
+    let formData = new FormData(e.currentTarget);
+    let latitude = formData.get("latitude") as string;
+    let longitude = formData.get("longitude") as string;
     cordenadasgps.push({ latitude: parseFloat(latitude), longitude: parseFloat(longitude) });
      e.currentTarget.reset();
     console.log(cordenadasgps);
   }
-  
-  // testegit 
   // Falta implementar a função de conversão de coordenadas GPS para UTM, que deve ser chamada após a inserção das coordenadas GPS.
+  function conversao(e: React.FormEvent  <HTMLFormElement>){
+    e.preventDefault();
+  for (const { latitude, longitude } of cordenadasgps) {
+    const zona = Math.floor((longitude + 180) / 6) + 1;
+    let epsg;
+   if (latitude < 0) {
+    epsg = UTMsul[zona];
+    
+  }else {
+    epsg = UTMnorte[zona];
+
+  }
+  cordenadasutm.push(proj4("EPSG:4674", epsg).forward([longitude, latitude]));
+  console.log(cordenadasutm)
+  }
+}
 function App() {
   const [count, setCount] = useState(0)
 
@@ -72,6 +86,9 @@ function App() {
         Insira latitude: <input type="text" name="latitude" id="latitude" />
         Insira longitude: <input type="text" name="longitude" id="longitude" />
         <button type="submit">Enviar</button>
+      </form>
+      <form onSubmit={conversao}>
+        <button type="submit">"converter</button>
       </form>
     </>
   )
